@@ -1,6 +1,7 @@
 #include "ets_sys.h"
 #include "driver/uart.h"
 #include "osapi.h"
+#include "dht.h"
 
 #include "os_type.h"
 #include "user_config.h"
@@ -26,5 +27,7 @@ user_init(void)
     //Set ap settings
     os_memcpy(&stationConf.ssid, ssid, 32);
     os_memcpy(&stationConf.password, password, 64);
-    wifi_station_set_config(&stationConf);    
+    wifi_station_set_config(&stationConf);
+
+    DHTInit(SENSOR_DHT22, 30000);
 }

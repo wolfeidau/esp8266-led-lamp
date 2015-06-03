@@ -3,6 +3,7 @@
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include "dht.h"
 
 #include "espconn.h"
 
@@ -14,6 +15,10 @@ user_devicefind_recv(void *arg, char *pusrdata, unsigned short length)
 
     os_printf("recieved data: %d\n", length);
     os_printf("data: %s\n", pusrdata);
+
+    struct sensor_reading* result = readDHT(0);
+
+    os_printf("humidity: %d temperature: %d success: %d\n", (int)(result->humidity), (int)(result->temperature), result->success);
  //    char DeviceBuffer[40] = {0};
  //    char Device_mac_buffer[60] = {0};
  //    char hwaddr[6];
