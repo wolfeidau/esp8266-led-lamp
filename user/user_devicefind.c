@@ -4,75 +4,48 @@
 #include "mem.h"
 #include "user_interface.h"
 #include "dht.h"
+#include "coap.h"
 
 #include "espconn.h"
 
 LOCAL struct espconn ptrespconn;
 
+uint8_t packetbuf[256];
+static uint8_t scratch_raw[32];
+static coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
+
 void ICACHE_FLASH_ATTR
 user_devicefind_recv(void *arg, char *pusrdata, unsigned short length)
 {
 
+    int rc;
+    coap_packet_t pkt;
+
     os_printf("recieved data: %d\n", length);
-    os_printf("data: %s\n", pusrdata);
+    //os_printf("data: %s\n", pusrdata);
 
     struct sensor_reading* result = readDHT(0);
 
     os_printf("humidity: %d temperature: %d success: %d\n", (int)(result->humidity), (int)(result->temperature), result->success);
- //    char DeviceBuffer[40] = {0};
- //    char Device_mac_buffer[60] = {0};
- //    char hwaddr[6];
 
- //    struct ip_info ipconfig;
+    if (0 != (rc = coap_parse(&pkt, pusrdata, length))) {
+        os_printf("bad packet: rc=%d\n", rc);
+    } else {
+        size_t rsplen = sizeof(packetbuf);
+        coap_packet_t rsppkt;
 
- //    if (wifi_get_opmode() != STATION_MODE) {
- //        wifi_get_ip_info(SOFTAP_IF, &ipconfig);
- //        wifi_get_macaddr(SOFTAP_IF, hwaddr);
+        coap_handle_req(&scratch_buf, &pkt, &rsppkt);
 
- //        if (!ip_addr_netcmp((struct ip_addr *)ptrespconn.proto.udp->remote_ip, &ipconfig.ip, &ipconfig.netmask)) {
- //            wifi_get_ip_info(STATION_IF, &ipconfig);
- //            wifi_get_macaddr(STATION_IF, hwaddr);
- //        }
- //    } else {
- //        wifi_get_ip_info(STATION_IF, &ipconfig);
- //        wifi_get_macaddr(STATION_IF, hwaddr);
- //    }
+        memset(packetbuf, 0, 256);
 
- //    if (pusrdata == NULL) {
- //        return;
- //    }
+        if (0 != (rc = coap_build(packetbuf, &rsplen, &rsppkt))) {
+            os_printf("coap_build: rc=%d\n", rc);
+        } else {
+            espconn_sent(&ptrespconn, packetbuf, rsplen);
+        }
 
-	// os_sprintf(DeviceBuffer, "%s" MACSTR " " IPSTR,	MAC2STR(hwaddr), IP2STR(&ipconfig.ip));
+    }
 
-	// os_printf("%s\n", DeviceBuffer);
-	// length = os_strlen(DeviceBuffer);
-	// espconn_sent(&ptrespconn, DeviceBuffer, length);
-
-    // if (length == os_strlen(device_find_request) &&
-    //         os_strncmp(pusrdata, device_find_request, os_strlen(device_find_request)) == 0) {
-    //     os_sprintf(DeviceBuffer, "%s" MACSTR " " IPSTR, device_find_response_ok,
-    //                MAC2STR(hwaddr), IP2STR(&ipconfig.ip));
-
-    //     os_printf("%s\n", DeviceBuffer);
-    //     length = os_strlen(DeviceBuffer);
-    //     espconn_sent(&ptrespconn, DeviceBuffer, length);
-    // } else if (length == (os_strlen(device_find_request) + 18)) {
-    //     os_sprintf(Device_mac_buffer, "%s " MACSTR , device_find_request, MAC2STR(hwaddr));
-    //     os_printf("%s", Device_mac_buffer);
-
-    //     if (os_strncmp(Device_mac_buffer, pusrdata, os_strlen(device_find_request) + 18) == 0) {
-    //         //os_printf("%s\n", Device_mac_buffer);
-    //         length = os_strlen(DeviceBuffer);
-    //         os_sprintf(DeviceBuffer, "%s" MACSTR " " IPSTR, device_find_response_ok,
-    //                    MAC2STR(hwaddr), IP2STR(&ipconfig.ip));
-
-    //         os_printf("%s\n", DeviceBuffer);
-    //         length = os_strlen(DeviceBuffer);
-    //         espconn_sent(&ptrespconn, DeviceBuffer, length);
-    //     } else {
-    //         return;
-    //     }
-    // }
 }
 
 // user device location which responds to a simple broadcast.

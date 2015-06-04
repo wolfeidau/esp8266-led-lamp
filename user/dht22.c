@@ -195,7 +195,7 @@ struct sensor_reading *ICACHE_FLASH_ATTR readDHT(int force) {
     return &reading;
 }
 
-void DHTInit(enum sensor_type sensor_type, uint32_t polltime) {
+void ICACHE_FLASH_ATTR DHTInit(enum sensor_type sensor_type, uint32_t polltime) {
   SENSOR = sensor_type;
   // Set GPIO2 to output mode for DHT22
   PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);

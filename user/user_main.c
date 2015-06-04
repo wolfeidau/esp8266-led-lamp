@@ -2,6 +2,7 @@
 #include "driver/uart.h"
 #include "osapi.h"
 #include "dht.h"
+#include "coap.h"
 
 #include "os_type.h"
 #include "user_config.h"
