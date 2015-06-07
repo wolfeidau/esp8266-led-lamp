@@ -25,7 +25,7 @@ SDK_BASE	?= /opt/Espressif/ESP8266_SDK
 
 # esptool.py path and port
 ESPTOOL		?= esptool.py
-ESPPORT		?= /dev/ttyACM0
+ESPPORT		?= /dev/ttyUSB0
 
 # name for the target project
 TARGET		= app
@@ -60,8 +60,6 @@ FW_FILE_2_ADDR	= 0x40000
 CC		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-gcc
 AR		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-ar
 LD		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-gcc
-
-
 
 ####
 #### no user configurable options below here
@@ -110,7 +108,7 @@ all: checkdirs $(TARGET_OUT) $(FW_FILE_1) $(FW_FILE_2)
 
 $(FW_BASE)/%.bin: $(TARGET_OUT) | $(FW_BASE)
 	$(vecho) "FW $(FW_BASE)/"
-	$(Q) $(ESPTOOL) elf2image -o $(FW_BASE)/ $(TARGET_OUT)
+	$(Q) esptool -bz 4M -bm dio -eo $(TARGET_OUT) -bo $(FW_FILE_1) -bs .text -bs .data -bs .rodata -bc -ec -eo $(TARGET_OUT) -es .irom0.text $(FW_FILE_2) -ec
 
 $(TARGET_OUT): $(APP_AR)
 	$(vecho) "LD $@"
@@ -129,7 +127,7 @@ $(FW_BASE):
 	$(Q) mkdir -p $@
 
 flash: $(FW_FILE_1) $(FW_FILE_2)
-	$(ESPTOOL) --port $(ESPPORT) write_flash $(FW_FILE_1_ADDR) $(FW_FILE_1) $(FW_FILE_2_ADDR) $(FW_FILE_2)
+	esptool -cp $(ESPPORT) -cd ck -ca $(FW_FILE_1_ADDR) -cf $(FW_FILE_1) -ca $(FW_FILE_2_ADDR) -cf $(FW_FILE_2)
 
 clean:
 	$(Q) rm -rf $(FW_BASE) $(BUILD_BASE)
