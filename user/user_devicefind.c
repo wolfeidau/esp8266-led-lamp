@@ -24,9 +24,9 @@ user_devicefind_recv(void *arg, char *pusrdata, unsigned short length)
     os_printf("recieved data: %d\n", length);
     //os_printf("data: %s\n", pusrdata);
 
-    struct sensor_reading* result = readDHT(0);
+//    struct sensor_reading* result = readDHT(0);
 
-    os_printf("humidity: %d temperature: %d success: %d\n", (int)(result->humidity), (int)(result->temperature), result->success);
+//    os_printf("humidity: %d temperature: %d success: %d\n", (int)(result->humidity), (int)(result->temperature), result->success);
 
     if (0 != (rc = coap_parse(&pkt, pusrdata, length))) {
         os_printf("bad packet: rc=%d\n", rc);

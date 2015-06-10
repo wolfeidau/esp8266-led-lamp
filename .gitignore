@@ -1,3 +1,4 @@
 build
 firmware
 include/user_config.h
+*.swp
