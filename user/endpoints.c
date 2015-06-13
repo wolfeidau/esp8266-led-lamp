@@ -9,7 +9,6 @@
 // we are controlling n leds with 3 colors
 #define LED_BUFFER_SIZE 24
 
-static char light = '1';
 static uint8_t buffer[LED_BUFFER_SIZE];
 
 const uint16_t rsplen = 1500;
