@@ -26,7 +26,7 @@ user_init(void)
     struct station_config stationConf;
 
     //Set station mode
-    wifi_set_opmode( 0x1 );
+    wifi_set_opmode(0x1);
 
     //Set ap settings
     os_memcpy(&stationConf.ssid, ssid, 32);
