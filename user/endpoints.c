@@ -18,6 +18,9 @@ void build_rsp(void);
 
 void endpoint_setup(void)
 {
+    // clear the buffer between writes
+    memset(&buffer[0], 0, sizeof(buffer));
+
     build_rsp();
 }
 
@@ -37,9 +40,6 @@ static int handle_put_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpk
 {
     int c = 0;
 
-    // clear the buffer between writes
-    memset(&buffer[0], 0, sizeof(buffer));
-
     // as we require 24 bytes of information to update the lights
     if (inpkt->payload.len != LED_BUFFER_SIZE)
         return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_OCTET_STREAM);
@@ -50,7 +50,7 @@ static int handle_put_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpk
         buffer[c] = (uint8_t)inpkt->payload.p[c];
     }
 
-    WS2812OutBuffer( buffer, inpkt->payload.len );
+    WS2812OutBuffer(buffer, inpkt->payload.len);
     return coap_make_response(scratch, outpkt, (const uint8_t *)&buffer[0], LED_BUFFER_SIZE, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_OCTET_STREAM);
 }
 
