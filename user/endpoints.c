@@ -6,8 +6,11 @@
 #include "ws2812.h"
 #include <stdio.h>
 
+// we are controlling n leds with 3 colors
+#define LED_BUFFER_SIZE 24
+
 static char light = '1';
-static uint8_t buffer[24];
+static uint8_t buffer[LED_BUFFER_SIZE];
 
 const uint16_t rsplen = 1500;
 static char rsp[1500] = "";
@@ -27,25 +30,28 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_pack
 static const coap_endpoint_path_t path_light = {1, {"light"}};
 static int handle_get_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    return coap_make_response(scratch, outpkt, (const uint8_t *)&light, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
+    return coap_make_response(scratch, outpkt, (const uint8_t *)&buffer[0], LED_BUFFER_SIZE, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_OCTET_STREAM);
 }
 
 static int handle_put_light(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
     int c = 0;
-    memset(&buffer[0], 0, sizeof(buffer));
-    if (inpkt->payload.len == 0)
-        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_TEXT_PLAIN);
 
-//    os_printf("LEDS payload len: %d\n", inpkt->payload.len);
+    // clear the buffer between writes
+    memset(&buffer[0], 0, sizeof(buffer));
+
+    // as we require 24 bytes of information to update the lights
+    if (inpkt->payload.len != LED_BUFFER_SIZE)
+        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_OCTET_STREAM);
+
+    // convert the payload to the types required in the WS2812 code
+    // TODO: may be better to make these match
     for (c = 0; c < inpkt->payload.len; c++) {
         buffer[c] = (uint8_t)inpkt->payload.p[c];
-//        os_printf(" %2x", buffer[c]);
     }
-//    os_printf("\n");
 
     WS2812OutBuffer( buffer, inpkt->payload.len );
-    return coap_make_response(scratch, outpkt, (const uint8_t *)&light, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+    return coap_make_response(scratch, outpkt, (const uint8_t *)&buffer[0], LED_BUFFER_SIZE, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_OCTET_STREAM);
 }
 
 const coap_endpoint_t endpoints[] =
