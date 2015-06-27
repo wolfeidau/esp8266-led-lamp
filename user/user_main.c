@@ -19,7 +19,8 @@ user_init(void)
     os_printf("Free Heap: %d\n", system_get_free_heap_size());
     os_printf("CPU Freq: %d\n", system_get_cpu_freq());
 
-    user_devicefind_init();
+    // initialise the coap server listener
+    user_coap_init();
 
     char ssid[32] = SSID;
     char password[64] = SSID_PASSWORD;
