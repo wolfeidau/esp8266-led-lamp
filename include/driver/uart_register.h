@@ -1,6 +1,5 @@
 /*
- * File	: uart_register.h
- * This file is part of Espressif's AT+ command set program.
+ * File : uart_register.h
  * Copyright (C) 2013 - 2016, Espressif Systems
  *
  * This program is free software: you can redistribute it and/or modify
@@ -120,7 +119,11 @@
 #define UART_BIT_NUM                        0x00000003
 #define UART_BIT_NUM_S                      2
 #define UART_PARITY_EN                      (BIT(1))
+#define UART_PARITY_EN_M                0x00000001
+#define UART_PARITY_EN_S                 1
 #define UART_PARITY                         (BIT(0))
+#define UART_PARITY_M                       0x00000001
+#define UART_PARITY_S                        0
 
 #define UART_CONF1(i)                   (REG_UART_BASE(i) + 0x24)
 #define UART_RX_TOUT_EN                     (BIT(31))
@@ -150,4 +153,5 @@
 #define UART_ID(i)                      (REG_UART_BASE(i) + 0x7C)
 
 #endif // UART_REGISTER_H_INCLUDED
+
 

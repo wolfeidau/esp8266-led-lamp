@@ -9,6 +9,10 @@
 #include "user_interface.h"
 #include "ws2812.h"
 
+void user_rf_pre_init(void)
+{
+}
+
 // entry of user application
 void ICACHE_FLASH_ATTR
 user_init(void)

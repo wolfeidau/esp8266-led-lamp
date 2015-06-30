@@ -1,6 +1,5 @@
 /*
- * File	: uart.h
- * This file is part of Espressif's UART driver.
+ * File : uart.h
  * Copyright (C) 2013 - 2016, Espressif Systems
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,11 +21,16 @@
 #include "eagle_soc.h"
 #include "c_types.h"
 
-#define UART_TX_BUFFER_SIZE 256
-#define UART_RX_BUFFER_SIZE 256
+#define UART_TX_BUFFER_SIZE 256  //Ring buffer length of tx buffer
+#define UART_RX_BUFFER_SIZE 256 //Ring buffer length of rx buffer
 
-#define UART_BUFF_EN  0   //use uart buffer
-#define UART_SELFTEST  0  //set 1:enable the loop test demo for uart buffer
+#define UART_BUFF_EN  0   //use uart buffer  , FOR UART0
+#define UART_SELFTEST  0  //set 1:enable the loop test demo for uart buffer, FOR UART0
+
+#define UART_HW_RTS   0   //set 1: enable uart hw flow control RTS, PIN MTDO, FOR UART0
+#define UART_HW_CTS  0    //set1: enable uart hw flow contrl CTS , PIN MTCK, FOR UART0
+
+
 
 
 #define UART0   0
@@ -127,10 +131,10 @@ typedef enum {
 } RcvMsgState;
 
 typedef struct {
-    UartBautRate 	     baut_rate;
+    UartBautRate         baut_rate;
     UartBitsNum4Char  data_bits;
     UartExistParity      exist_parity;
-    UartParityMode 	    parity;    // chip size in byte
+    UartParityMode      parity;
     UartStopBitsNum   stop_bits;
     UartFlowCtrl         flow_ctrl;
     RcvMsgBuff          rcv_buff;
@@ -210,6 +214,7 @@ void UART_ResetFifo(uint8 uart_no);
 void UART_ClearIntrStatus(uint8 uart_no,uint32 clr_mask);
 void UART_SetIntrEna(uint8 uart_no,uint32 ena_mask);
 void UART_SetPrintPort(uint8 uart_no);
+bool UART_CheckOutputFinished(uint8 uart_no, uint32 time_out_us);
 //==============================================
 
 #endif
