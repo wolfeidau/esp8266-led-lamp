@@ -1,3 +1,10 @@
+#
+# To use this first build an image with some tag, then use it to run your builds.
+#
+# docker build -t esp8266-led-lamp .
+#
+# docker run -v $(pwd):/project -i -t esp8266-led-lamp make
+#
 FROM wolfeidau/esp8266-dev:1.1.0
 
 # add all the SDK stuff to the PATH
