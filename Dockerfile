@@ -5,7 +5,7 @@
 #
 # docker run -v /Users:/Users -i -t esp8266-build make
 #
-FROM wolfeidau/esp8266-dev:1.1.0
+FROM wolfeidau/esp8266-dev:1.2.0
 
 # add all the SDK stuff to the PATH
 ENV PATH=$PATH:/opt/Espressif/crosstool-NG/builds/xtensa-lx106-elf/bin
